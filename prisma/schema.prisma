@@ -31,7 +31,20 @@ model Profile {
 model User {
   id      Int      @id @default(autoincrement())
   email   String   @unique
-  name    String?
+  fullname    String? @db.VarChar(100)
+  status  UserStatus? @default(INACTIVE)
+  role UserRole @default(USER)
   posts   Post[]
   profile Profile?
+}
+
+enum UserStatus{
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
