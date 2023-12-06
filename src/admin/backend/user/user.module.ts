@@ -5,5 +5,6 @@ import { UserBackendService } from './user.service';
 @Module({
   controllers: [UserBackendController],
   providers: [UserBackendService],
+  exports: [UserBackendModule],
 })
 export class UserBackendModule {}

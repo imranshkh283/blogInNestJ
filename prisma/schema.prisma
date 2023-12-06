@@ -29,16 +29,18 @@ model Profile {
 }
 
 model User {
-  id      Int      @id @default(autoincrement())
-  email   String   @unique
-  fullname    String? @db.VarChar(100)
-  status  UserStatus? @default(INACTIVE)
-  role UserRole @default(USER)
-  posts   Post[]
-  profile Profile?
+  id        Int         @id @default(autoincrement())
+  email     String      @unique
+  firstname String      @db.VarChar(150)
+  lastname  String      @db.VarChar(150)
+  fullname  String      @db.VarChar(250)
+  status    UserStatus? @default(INACTIVE)
+  role      UserRole    @default(USER)
+  posts     Post[]
+  profile   Profile?
 }
 
-enum UserStatus{
+enum UserStatus {
   ACTIVE
   INACTIVE
   PENDING

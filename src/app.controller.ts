@@ -3,12 +3,7 @@ import { AppService } from './app.service';
 
 @Controller()
 export class AppController {
-  constructor(
-    private readonly appService: AppService,
-    @Inject('EVENT_STORE') private readonly eventBus,
-  ) {
-    console.log(this.eventBus);
-  }
+  constructor(private readonly appService: AppService) {}
 
   @Get()
   getHello(): string {
