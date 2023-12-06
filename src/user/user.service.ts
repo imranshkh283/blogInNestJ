@@ -1,20 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
-import { User } from '@prisma/client';
+import { isEmailExists } from '../utils/email.utils';
 
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto) {
-    return await this.prisma.user.create({
+  async create({ firstname, lastname, email }: CreateUserDto) {
+    const emailExists = await isEmailExists(this.prisma, email);
+    if (emailExists) {
+      throw new ConflictException(`Email already exists.`);
+    }
+    const user = await this.prisma.user.create({
+      select: {
+        fullname: true,
+        email: true,
+      },
       data: {
-        email: 'imranshkh283@gmail.com',
-        fullname: 'imran',
+        firstname: firstname,
+        lastname: lastname,
+        fullname: `${firstname} ${lastname}`,
+        email: email,
       },
     });
+    return user;
   }
 
   async findAll() {
@@ -22,22 +33,43 @@ export class UserService {
     return { users };
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+  async update(email: string, updateUserDto: UpdateUserDto) {
+    const emailExists = await isEmailExists(this.prisma, email);
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.prisma.user.update({
-      where: { id },
+    if (!emailExists) {
+      throw new ConflictException(`Invalid Email.`);
+    }
+    const updateData = await this.prisma.user.update({
+      where: { email },
       data: {
-        role: 'ADMIN',
-        status: 'ACTIVE',
+        ...updateUserDto,
+        fullname: `${updateUserDto.firstname} ${updateUserDto.lastname}`,
       },
       select: {
         fullname: true,
         email: true,
       },
     });
+    return updateData;
+  }
+
+  async activateUser(email: string) {
+    const emailExists = await isEmailExists(this.prisma, email);
+
+    if (!emailExists) {
+      throw new ConflictException(`Invalid Email.`);
+    }
+
+    const changeStatus = await this.prisma.user.update({
+      where: { email },
+      data: {
+        status: 'ACTIVE',
+      },
+      select: {
+        status: true,
+      },
+    });
+    return `${changeStatus.status}`;
   }
 
   remove(id: number) {

@@ -6,7 +6,8 @@ import {
   Patch,
   Param,
   Delete,
-} from '@nestjs/common';
+  HttpCode,
+  HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,9 +16,10 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  @Post('create')
+  @HttpCode(HttpStatus.OK)
+  create(@Body() data: CreateUserDto) {
+    return this.userService.create(data);
   }
 
   @Get()
@@ -25,14 +27,14 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.userService.findOne(+id);
+  @Post('/updateInfo')
+  update(@Body('email') email: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(email, updateUserDto);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  @Post('/activate')
+  activateChange(@Body('email') email: string) {
+    return this.userService.activateUser(email);
   }
 
   @Delete(':id')
