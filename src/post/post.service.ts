@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma.service';
+
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
@@ -13,8 +14,10 @@ export class PostService {
         AND: [{ email }, { status: 'ACTIVE' }, { role: 'USER' }],
       },
     });
-
-    const post = await this.prisma.post.create({
+    if (!author.length) {
+      throw new HttpException('Author not found', HttpStatus.UNAUTHORIZED);
+    }
+    let post = await this.prisma.post.create({
       data: {
         authorId: author[0].id,
         title,
@@ -32,10 +35,17 @@ export class PostService {
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} post`;
+    const postData = this.prisma.post.findMany({
+      select: { title: true, content: true },
+      where: { id: id },
+    });
+    return postData;
   }
 
   update(id: number, updatePostDto: UpdatePostDto) {
-    return `This action updates a #${id} post`;
+    return this.prisma.post.update({
+      where: { id },
+      data: updatePostDto,
+    });
   }
 }

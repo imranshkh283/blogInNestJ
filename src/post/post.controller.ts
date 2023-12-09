@@ -1,11 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
+  HttpCode,
+  HttpStatus,
   Param,
-  Query,
+  Post,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
@@ -31,11 +31,12 @@ export class PostController {
   }
 
   @Get(':id')
-  findOne(@Query('id') params: Param) {
-    // return this.postService.findOne(+id);
+  findOne(@Param('id') id: number) {
+    return this.postService.findOne(+id);
   }
 
-  @Patch(':id')
+  @Post(':id')
+  @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(+id, updatePostDto);
   }

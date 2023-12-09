@@ -15,6 +15,7 @@ model post {
   content   String?
   published Boolean  @default(false)
   authorId  Int
+  tags      String?  @db.VarChar(255)
   user      user     @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
 
   @@index([authorId], map: "Post_authorId_fkey")
