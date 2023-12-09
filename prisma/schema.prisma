@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,43 +7,54 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
+model post {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime
   title     String   @db.VarChar(255)
   content   String?
   published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
   authorId  Int
+  user      user     @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
+
+  @@index([authorId], map: "Post_authorId_fkey")
 }
 
-model Profile {
+model profile {
   id     Int     @id @default(autoincrement())
   bio    String?
-  user   User    @relation(fields: [userId], references: [id])
-  userId Int     @unique
+  userId Int     @unique(map: "Profile_userId_key")
+  user   user    @relation(fields: [userId], references: [id], map: "Profile_userId_fkey")
 }
 
-model User {
-  id        Int         @id @default(autoincrement())
-  email     String      @unique
-  firstname String      @db.VarChar(150)
-  lastname  String      @db.VarChar(150)
-  fullname  String      @db.VarChar(250)
-  status    UserStatus? @default(INACTIVE)
-  role      UserRole    @default(USER)
-  posts     Post[]
-  profile   Profile?
+model user {
+  id        Int          @id @default(autoincrement())
+  email     String       @unique(map: "User_email_key")
+  firstname String       @db.VarChar(150)
+  lastname  String       @db.VarChar(150)
+  fullname  String       @db.VarChar(250)
+  status    user_status? @default(INACTIVE)
+  role      user_role    @default(USER)
+  post      post[]
+  profile   profile?
 }
 
-enum UserStatus {
+model logentry {
+  id     Int      @id @default(autoincrement())
+  method String
+  url    String
+  body   String?  @db.LongText
+  ip     String
+  date   DateTime @default(now())
+}
+
+enum user_status {
   ACTIVE
   INACTIVE
   PENDING
 }
 
-enum UserRole {
+enum user_role {
   USER
   ADMIN
 }

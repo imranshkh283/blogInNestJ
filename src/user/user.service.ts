@@ -3,7 +3,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
 import { isEmailExists } from '../utils/email.utils';
-
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
@@ -25,6 +24,7 @@ export class UserService {
         email: email,
       },
     });
+
     return user;
   }
 

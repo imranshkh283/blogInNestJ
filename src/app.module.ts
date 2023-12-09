@@ -6,9 +6,8 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { ReportsBackendModule } from './admin/backend/reports/reports.module';
 import { UserBackendModule } from './admin/backend/user/user.module';
-
-const arr = ['PROD', 'DEV', 'STAGE'];
-const IS_DEV_MODE = false;
+import { PostModule } from './post/post.module';
+import { LoggerInterceptor } from './logger.interceptor';
 
 @Module({
   imports: [
@@ -18,8 +17,9 @@ const IS_DEV_MODE = false;
       { path: 'admin/backend/', module: UserBackendModule },
       { path: 'admin/backend/', module: ReportsBackendModule },
     ]),
+    PostModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, LoggerInterceptor],
 })
 export class AppModule {}
