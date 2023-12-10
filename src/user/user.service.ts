@@ -1,8 +1,9 @@
 import { ConflictException, Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateProfileDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
 import { isEmailExists } from '../utils/email.utils';
+
 @Injectable()
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
@@ -72,7 +73,39 @@ export class UserService {
     return `${changeStatus.status}`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async createProfile(data: CreateProfileDto) {
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: data.userId },
+    });
+    if (!userExists) throw new ConflictException(`User does not exist.`);
+    const profile = await this.prisma.profile.create({
+      data: { ...data },
+      select: {
+        id: true,
+        bio: true,
+        userId: true,
+      },
+    });
+    return profile;
+  }
+
+  async updateProfile(data: CreateProfileDto) {
+    const userExists = await this.prisma.user.findUnique({
+      where: { id: data.userId },
+    });
+    if (!userExists) throw new ConflictException(`User does not exist.`);
+    const profile = await this.prisma.profile.update({
+      where: { id: data.userId },
+      data: { ...data },
+      select: {
+        bio: true,
+        user: {
+          select: {
+            fullname: true,
+          },
+        },
+      },
+    });
+    return profile;
   }
 }

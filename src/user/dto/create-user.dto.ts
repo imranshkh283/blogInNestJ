@@ -3,3 +3,8 @@ export class CreateUserDto {
   firstname: string;
   lastname: string;
 }
+
+export class CreateProfileDto {
+  bio: string;
+  userId: number;
+}
