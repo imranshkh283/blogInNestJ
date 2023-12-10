@@ -31,7 +31,9 @@ export class PostService {
   }
 
   findAll() {
-    return this.prisma.post.findMany();
+    return this.prisma.post.findMany({
+      select: { title: true, content: true, tags: true },
+    });
   }
 
   findOne(id: number) {
@@ -47,5 +49,19 @@ export class PostService {
       where: { id },
       data: updatePostDto,
     });
+  }
+
+  async addTags(id: number, tags: string) {
+    const [post] = await Promise.all([
+      this.prisma.post.findUnique({
+        where: { id },
+      }),
+    ]);
+    if (!post) throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    const updateTags = await this.prisma.post.update({
+      data: { tags },
+      where: { id },
+    });
+    return updateTags;
   }
 }
