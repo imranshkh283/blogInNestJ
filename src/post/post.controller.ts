@@ -11,11 +11,6 @@ import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
-interface Param {
-  id: number;
-  name: string;
-}
-
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
@@ -39,5 +34,11 @@ export class PostController {
   @HttpCode(HttpStatus.OK)
   update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto) {
     return this.postService.update(+id, updatePostDto);
+  }
+
+  @Post('addTags/:id')
+  @HttpCode(HttpStatus.OK)
+  addTags(@Param('id') id: number, @Body('tags') tags: string) {
+    return this.postService.addTags(+id, tags); // +id converts string to number
   }
 }

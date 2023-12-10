@@ -1,13 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
   HttpCode,
-  HttpStatus } from '@nestjs/common';
+  HttpStatus,
+  Post,
+} from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -35,10 +33,5 @@ export class UserController {
   @Post('/activate')
   activateChange(@Body('email') email: string) {
     return this.userService.activateUser(email);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
   }
 }
