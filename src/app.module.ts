@@ -4,9 +4,10 @@ import { AppService } from './app.service';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { LoggerInterceptor } from './logger.interceptor';
+import { CommentsModule } from './comments/comments.module';
 
 @Module({
-  imports: [UserModule, PostModule],
+  imports: [UserModule, PostModule, CommentsModule],
   controllers: [AppController],
   providers: [AppService, LoggerInterceptor],
 })
