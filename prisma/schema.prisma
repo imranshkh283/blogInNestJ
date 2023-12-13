@@ -8,15 +8,16 @@ datasource db {
 }
 
 model post {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
+  id        Int        @id @default(autoincrement())
+  createdAt DateTime   @default(now())
   updatedAt DateTime
-  title     String   @db.VarChar(255)
+  title     String     @db.VarChar(255)
   content   String?
-  published Boolean  @default(false)
+  published Boolean    @default(false)
   authorId  Int
-  tags      String?  @db.VarChar(255)
-  user      user     @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
+  tags      String?    @db.VarChar(255)
+  user      user       @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
+  Comments  Comments[]
 
   @@index([authorId], map: "Post_authorId_fkey")
 }
@@ -38,6 +39,7 @@ model user {
   role      user_role    @default(USER)
   post      post[]
   profile   profile?
+  Comments  Comments?
 }
 
 model logentry {
@@ -47,6 +49,19 @@ model logentry {
   body   String?  @db.LongText
   ip     String
   date   DateTime @default(now())
+}
+
+model Comments {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  author   user @relation(fields: [authorId], references: [id])
+  authorId Int  @unique
+
+  post   post @relation(fields: [postId], references: [id])
+  postId Int
 }
 
 enum user_status {

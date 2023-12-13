@@ -32,13 +32,13 @@ export class PostService {
 
   findAll() {
     return this.prisma.post.findMany({
-      select: { title: true, content: true, tags: true },
+      select: { id: true, title: true, content: true, tags: true },
     });
   }
 
   findOne(id: number) {
     const postData = this.prisma.post.findMany({
-      select: { title: true, content: true },
+      select: { id: true, title: true, content: true },
       where: { id: id },
     });
     return postData;
