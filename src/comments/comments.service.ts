@@ -24,4 +24,25 @@ export class CommentsService {
     });
     return comments;
   }
+
+  async getCommentById(postId: number): Promise<any> {
+    const postsWithComments = await this.prisma.comments.findMany({
+      where: {
+        postId: postId,
+      },
+      select: {
+        content: true,
+        post: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
+    });
+    if (!postsWithComments) {
+      return null;
+    }
+    return postsWithComments;
+  }
 }
