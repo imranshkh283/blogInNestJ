@@ -1,9 +1,11 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
 } from '@nestjs/common';
 import { CommentsService } from './comments.service';
@@ -20,5 +22,19 @@ export class CommentsController {
     @Param() params: ParamsCommentDto,
   ) {
     return this.commentsService.create({ content }, params);
+  }
+
+  @Get(':postId')
+  getCommentById(
+    @Param(
+      'postId',
+      new ParseIntPipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+        exceptionFactory: () => new Error('postId must be a number'),
+      }),
+    )
+    postId: number,
+  ) {
+    return this.commentsService.getCommentById(postId);
   }
 }
