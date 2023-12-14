@@ -37,9 +37,14 @@ export class PostService {
   }
 
   findOne(id: number) {
-    const postData = this.prisma.post.findMany({
-      select: { id: true, title: true, content: true },
+    const postData = this.prisma.post.findUnique({
       where: { id: id },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        tags: true,
+      },
     });
     return postData;
   }
