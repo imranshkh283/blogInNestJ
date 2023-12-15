@@ -3,6 +3,8 @@ import { CreateProfileDto, CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { PrismaService } from '../prisma.service';
 import { isEmailExists } from '../utils/email.utils';
+import { isEmail } from 'class-validator';
+import { UserType } from '../types/user.type';
 
 @Injectable()
 export class UserService {
@@ -34,24 +36,54 @@ export class UserService {
     return { users };
   }
 
-  async update(email: string, updateUserDto: UpdateUserDto) {
+  async findActiveUsers() {
+    const users = await this.prisma.user.findMany({
+      where: { status: 'ACTIVE' },
+    });
+    return { users };
+  }
+
+  async findUserByEmail(
+    email: string,
+  ): Promise<Pick<UserType, 'id' | 'fullname' | 'email'>> {
+    const checkEmailValid = isEmail(email);
+    if (!checkEmailValid) throw new ConflictException(`Invalid Email.`);
+
+    const EmailExists = await isEmailExists(this.prisma, email);
+    if (!EmailExists) throw new ConflictException(`Email does not exist.`);
+
+    return this.prisma.user.findUnique({
+      where: { email },
+      select: {
+        id: true,
+        fullname: true,
+        email: true,
+        status: true,
+      },
+    });
+  }
+
+  async update(
+    email: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<Pick<UserType, 'id' | 'fullname' | 'email'>> {
     const emailExists = await isEmailExists(this.prisma, email);
 
     if (!emailExists) {
       throw new ConflictException(`Invalid Email.`);
     }
-    const updateData = await this.prisma.user.update({
+    return this.prisma.user.update({
       where: { email },
       data: {
         ...updateUserDto,
         fullname: `${updateUserDto.firstname} ${updateUserDto.lastname}`,
       },
       select: {
+        id: true,
         fullname: true,
         email: true,
       },
     });
-    return updateData;
   }
 
   async activateUser(email: string) {

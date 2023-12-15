@@ -4,7 +4,9 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -14,15 +16,25 @@ import { UpdateUserDto } from './dto/update-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('create')
+  @Post('createUser')
   @HttpCode(HttpStatus.OK)
-  create(@Body() data: CreateUserDto) {
+  create(@Body(ValidationPipe) data: CreateUserDto) {
     return this.userService.create(data);
   }
 
   @Get()
   findAll() {
     return this.userService.findAll();
+  }
+
+  @Get('/active')
+  findActiveUsers() {
+    return this.userService.findActiveUsers();
+  }
+
+  @Get('email/:email')
+  findUserByEmail(@Param('email') email: string) {
+    return this.userService.findUserByEmail(email);
   }
 
   @Post('/updateInfo')
