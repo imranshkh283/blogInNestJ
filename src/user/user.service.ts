@@ -10,11 +10,16 @@ import { UserType } from '../types/user.type';
 export class UserService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({ firstname, lastname, email }: CreateUserDto) {
+  async create({
+    firstname,
+    lastname,
+    email,
+  }: CreateUserDto): Promise<
+    Pick<UserType, 'firstname' | 'lastname' | 'email' | 'fullname'>
+  > {
     const emailExists = await isEmailExists(this.prisma, email);
-    if (emailExists) {
-      throw new ConflictException(`Email already exists.`);
-    }
+    if (emailExists) throw new ConflictException(`Email already exists.`);
+
     const user = await this.prisma.user.create({
       select: {
         fullname: true,
@@ -28,19 +33,20 @@ export class UserService {
       },
     });
 
+    // @ts-ignore
     return user;
   }
 
-  async findAll() {
+  async findAll(): Promise<any> {
     const users = await this.prisma.user.findMany();
-    return { users };
+    return users;
   }
 
-  async findActiveUsers() {
-    const users = await this.prisma.user.findMany({
+  // async findActiveUsers(): Promise<Omit<UserType, 'role' | 'status'>> {
+  async findActiveUsers(): Promise<Omit<UserType, 'role' | 'status'>[] | null> {
+    return this.prisma.user.findMany({
       where: { status: 'ACTIVE' },
     });
-    return { users };
   }
 
   async findUserByEmail(

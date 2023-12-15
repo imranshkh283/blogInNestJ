@@ -1,14 +1,12 @@
-export interface UserType {
+export type UserType = {
   id: number;
-  name: string;
   email: string;
-  fullname: string;
   firstname: string;
   lastname: string;
-  password: string;
-  status: UserStatus;
-  role: UserRole;
-}
+  fullname: string;
+  status?: UserStatus;
+  role?: UserRole;
+};
 
 enum UserStatus {
   ACTIVE = 'ACTIVE',
