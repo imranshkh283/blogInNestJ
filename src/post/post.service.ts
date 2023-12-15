@@ -7,7 +7,7 @@ import { PrismaService } from '../prisma.service';
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({ title, content, email }: CreatePostDto) {
+  async create({ title, content, email }: CreatePostDto): Promise<any> {
     const author = await this.prisma.user.findMany({
       select: { id: true },
       where: {

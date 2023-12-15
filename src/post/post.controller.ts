@@ -17,7 +17,7 @@ export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post('createPost')
-  createPost(@Body(ValidationPipe) data: CreatePostDto) {
+  createPost(@Body(ValidationPipe) data: CreatePostDto): Promise<any> {
     return this.postService.create(data);
   }
 
