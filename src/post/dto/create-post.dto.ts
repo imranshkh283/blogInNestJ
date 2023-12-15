@@ -5,7 +5,6 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
-  MaxLength,
   MinLength,
 } from 'class-validator';
 
@@ -17,7 +16,6 @@ export class CreatePostDto {
   @IsString()
   @IsEmail()
   @MinLength(3)
-  @MaxLength(200)
   email: string;
 
   @IsNotEmpty({ message: 'Title is required' })
