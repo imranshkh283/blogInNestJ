@@ -7,19 +7,38 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model post {
-  id        Int        @id @default(autoincrement())
-  createdAt DateTime   @default(now())
-  updatedAt DateTime
-  title     String     @db.VarChar(255)
-  content   String?
-  published Boolean    @default(false)
-  authorId  Int
-  tags      String?    @db.VarChar(255)
-  user      user       @relation(fields: [authorId], references: [id], map: "Post_authorId_fkey")
-  Comments  Comments[]
+model user {
+  id            Int          @id @default(autoincrement())
+  email         String       @unique(map: "User_email_key")
+  firstname     String       @db.VarChar(150)
+  lastname      String       @db.VarChar(150)
+  fullname      String       @db.VarChar(250)
+  status        user_status? @default(INACTIVE)
+  role          user_role    @default(USER)
+  writtenPost   post[]       @relation("WrittedPosts")
+  favouritePost post[]       @relation("FavouritePosts")
+  profile       profile?
+  Comments      Comments?
+}
 
-  @@index([authorId], map: "Post_authorId_fkey")
+model post {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime
+  title     String   @db.VarChar(255)
+  content   String?
+  published Boolean  @default(false)
+  tags      String?  @db.VarChar(255)
+
+  user     user @relation("WrittedPosts", fields: [authorId], references: [id])
+  authorId Int
+
+  favouritedBy user @relation("FavouritePosts", fields: [favouritedId], references: [id])
+  favouritedId Int
+
+  Comments Comments[]
+
+  //@@index([authorId], map: "Post_authorId_fkey")
 }
 
 model profile {
@@ -27,19 +46,6 @@ model profile {
   bio    String?
   userId Int     @unique(map: "Profile_userId_key")
   user   user    @relation(fields: [userId], references: [id], map: "Profile_userId_fkey")
-}
-
-model user {
-  id        Int          @id @default(autoincrement())
-  email     String       @unique(map: "User_email_key")
-  firstname String       @db.VarChar(150)
-  lastname  String       @db.VarChar(150)
-  fullname  String       @db.VarChar(250)
-  status    user_status? @default(INACTIVE)
-  role      user_role    @default(USER)
-  post      post[]
-  profile   profile?
-  Comments  Comments?
 }
 
 model logentry {
