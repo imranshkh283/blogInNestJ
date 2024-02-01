@@ -30,24 +30,38 @@ model profile {
 }
 
 model user {
-  id             Int             @id @default(autoincrement())
-  email          String          @unique(map: "User_email_key")
-  firstname      String          @db.VarChar(150)
-  lastname       String          @db.VarChar(150)
-  fullname       String          @db.VarChar(250)
-  status         user_status?    @default(INACTIVE)
-  role           user_role       @default(USER)
-  post           post[]
-  profile        profile?
-  Comments       Comments?
-  userPreference userPreference?
+  id        Int          @id @default(autoincrement())
+  email     String       @unique(map: "User_email_key")
+  firstname String       @db.VarChar(150)
+  lastname  String       @db.VarChar(150)
+  fullname  String       @db.VarChar(250)
+  status    user_status? @default(INACTIVE)
+  role      user_role    @default(USER)
+  post      post[]
+  profile   profile?
+  Comments  Comments?
+
+  // 1. Just for testing purpose
+  // userPreference userPreference?
+
+  // 2. Just for testing purpose
+  userPreference userPreference? @relation(fields: [userId], references: [id])
+  userId         Int?            @unique
+
+  @@unique([email, firstname, lastname])
+  @@index([email, id])
 }
 
 model userPreference {
   id           Int     @id @default(autoincrement())
   emailUpdates Boolean
-  user         user    @relation(fields: [userId], references: [id])
-  userId       Int     @unique
+
+  // 1. Just for testing purpose
+  // user         user    @relation(fields: [userId], references: [id])
+  // userId       Int     @unique
+
+  // 2. Just for testing purpose
+  user user?
 }
 
 model logentry {
