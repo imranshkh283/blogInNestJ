@@ -5,30 +5,36 @@ import {
   HttpCode,
   HttpStatus,
   Param,
+  ParseIntPipe,
   Post,
   ValidationPipe,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { PostType } from '../types/post.type';
 
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post('createPost')
-  createPost(@Body(ValidationPipe) data: CreatePostDto): Promise<any> {
+  @HttpCode(HttpStatus.CREATED)
+  createPost(
+    @Body(ValidationPipe) data: CreatePostDto,
+  ): Promise<Omit<PostType, 'id' | 'title' | 'content' | 'createdAt'>> {
     return this.postService.create(data);
   }
 
   @Get()
-  findAll() {
+  @HttpCode(HttpStatus.OK)
+  findAll(): Promise<Pick<PostType, 'id' | 'title' | 'content'>[]> {
     return this.postService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.postService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number) {
+    return this.postService.findOne(id);
   }
 
   @Post(':id')

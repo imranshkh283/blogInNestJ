@@ -24,6 +24,8 @@ export class UserService {
       select: {
         fullname: true,
         email: true,
+        firstname: true,
+        lastname: true,
       },
       data: {
         firstname: firstname,
@@ -33,7 +35,6 @@ export class UserService {
       },
     });
 
-    // @ts-ignore
     return user;
   }
 
@@ -105,6 +106,8 @@ export class UserService {
         status: 'ACTIVE',
       },
       select: {
+        id: true,
+        email: true,
         status: true,
       },
     });

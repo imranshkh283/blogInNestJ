@@ -2,12 +2,19 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma.service';
+import { PostType } from '../types/post.type';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({ title, content, email }: CreatePostDto): Promise<any> {
+  async create({
+    title,
+    content,
+    email,
+  }: CreatePostDto): Promise<
+    Omit<PostType, 'id' | 'title' | 'content' | 'createdAt' | 'tags'>
+  > {
     const author = await this.prisma.user.findMany({
       select: { id: true },
       where: {
@@ -17,7 +24,7 @@ export class PostService {
     if (!author.length) {
       throw new HttpException('Author not found', HttpStatus.UNAUTHORIZED);
     }
-    let post = await this.prisma.post.create({
+    const post = await this.prisma.post.create({
       data: {
         authorId: author[0].id,
         title,
@@ -25,27 +32,38 @@ export class PostService {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        createdAt: true,
+      },
     });
 
     return post;
   }
 
-  findAll() {
+  findAll(): Promise<Pick<PostType, 'id' | 'title' | 'content'>[]> {
     return this.prisma.post.findMany({
       select: { id: true, title: true, content: true, tags: true },
     });
   }
 
-  findOne(id: number) {
-    const postData = this.prisma.post.findUnique({
-      where: { id: id },
+  async findOne(id: number): Promise<PostType | null> {
+    const postData = await this.prisma.post.findUnique({
+      where: { id },
       select: {
         id: true,
         title: true,
         content: true,
         tags: true,
+        createdAt: true,
       },
     });
+
+    if (!postData) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
     return postData;
   }
 
