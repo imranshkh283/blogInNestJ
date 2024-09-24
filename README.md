@@ -33,6 +33,8 @@ This project is a RESTful API built with the NestJS framework, utilizing Prisma 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (version >= 14.x)
-- npm (version >= 6.x)
-- A relational database (e.g., PostgreSQL, MySQL)
+- NestJS 
+- npm 
+- A relational database (MySQL)
+- Primsa
+- Class Validation
