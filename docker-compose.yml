@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8
+    container_name: nestjs_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root        # Replace with your root password
+      MYSQL_DATABASE: nestjsblog        # Replace with your database name
+      MYSQL_USER: localhost                     # Replace with your MySQL user
+      MYSQL_PASSWORD: root             # Replace with your MySQL user's password
+    ports:
+      - '3333:3306'
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
