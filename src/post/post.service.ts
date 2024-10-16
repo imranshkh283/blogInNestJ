@@ -49,7 +49,7 @@ export class PostService {
     });
   }
 
-  async findOne(id: number): Promise<PostType | null> {
+  async findOne(id: number) {
     const postData = await this.prisma.post.findUnique({
       where: { id },
       select: {

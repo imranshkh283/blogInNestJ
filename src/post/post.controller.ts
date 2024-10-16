@@ -22,7 +22,7 @@ export class PostController {
   @HttpCode(HttpStatus.CREATED)
   createPost(
     @Body(ValidationPipe) data: CreatePostDto,
-  ): Promise<Omit<PostType, 'id' | 'title' | 'content' | 'createdAt'>> {
+  ) {
     return this.postService.create(data);
   }
 

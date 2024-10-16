@@ -32,6 +32,7 @@ model profile {
 model user {
   id        Int          @id @default(autoincrement())
   email     String       @unique(map: "User_email_key")
+  password  String?
   firstname String       @db.VarChar(150)
   lastname  String       @db.VarChar(150)
   fullname  String       @db.VarChar(250)
