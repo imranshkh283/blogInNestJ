@@ -42,8 +42,13 @@ export class UserController {
     return this.userService.update(email, updateUserDto);
   }
 
-  @Post('/activate')
-  activateChange(@Body('email') email: string) {
+  @Get('/sendVerificationEmail')
+  sendVerificationEmail(@Body('email') email: string) {
+    return this.userService.sendVerificationEmail(email);
+  }
+
+  @Get('/verify-email/:email')
+  activateChange(@Param('email') email: string) {
     return this.userService.activateUser(email);
   }
 }
