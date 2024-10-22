@@ -48,7 +48,7 @@ export class UserController {
   }
 
   @Get('/verify-email/:email')
-  activateChange(@Param('email') email: string) {
-    return this.userService.activateUser(email);
+  async activateChange(@Param('email') email: string) {
+    return await this.userService.activateUser(email);
   }
 }

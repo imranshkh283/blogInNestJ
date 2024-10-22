@@ -105,7 +105,7 @@ export class UserService {
       throw new ConflictException(`Invalid Email.`);
     }
 
-    await this.prisma.user.update({
+    const user = await this.prisma.user.update({
       where: { email },
       data: {
         status: 'ACTIVE',
@@ -116,6 +116,8 @@ export class UserService {
         status: true,
       },
     });
+
+    return { message: 'Email verified successfully', user };
   }
 
   async sendVerificationEmail(email: string) {
