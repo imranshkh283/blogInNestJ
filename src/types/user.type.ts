@@ -4,11 +4,12 @@ export type UserType = {
   firstname: string;
   lastname: string;
   fullname: string;
-  status?: UserStatus;
+  status?: user_status;
   role?: UserRole;
+  password?: string;
 };
 
-enum UserStatus {
+export enum user_status {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   DELETED = 'DELETED',

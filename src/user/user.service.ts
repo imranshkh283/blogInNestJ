@@ -7,6 +7,7 @@ import { isEmail } from 'class-validator';
 import { UserType } from '../types/user.type';
 import { MailService } from 'src/mail/mail.service';
 import mailTemplate from '../mail/mail.template';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class UserService {
@@ -57,14 +58,14 @@ export class UserService {
 
   async findUserByEmail(
     email: string,
-  ): Promise<Pick<UserType, 'id' | 'fullname' | 'email'>> {
+  ): Promise<Pick<UserType, 'id' | 'fullname' | 'email' | 'status'>> {
     const checkEmailValid = isEmail(email);
     if (!checkEmailValid) throw new ConflictException(`Invalid Email.`);
 
     const EmailExists = await isEmailExists(this.prisma, email);
     if (!EmailExists) throw new ConflictException(`Email does not exist.`);
 
-    return this.prisma.user.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email },
       select: {
         id: true,
@@ -73,6 +74,7 @@ export class UserService {
         status: true,
       },
     });
+    return { ...user, status: user.status as UserType['status'] };
   }
 
   async update(
@@ -132,6 +134,8 @@ export class UserService {
       subject: 'Verify Your Email Address',
       text: mailTemplate(email),
     });
+
+    return 'Email sent successfully';
   }
 
   async createProfile(data: CreateProfileDto) {
