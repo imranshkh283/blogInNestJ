@@ -34,10 +34,7 @@ export class AuthService {
       };
 
       return {
-        token: await this.jwtService.signAsync(
-          payload,
-          this.getAccessTokenOptions(userDetails?.id),
-        ),
+        token: await this.jwtService.signAsync(payload),
         success: true,
         message: 'Login Successful',
         failure: false,
