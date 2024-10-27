@@ -9,14 +9,11 @@ import {
 } from 'class-validator';
 
 export class CreatePostDto {
-  @IsEmpty()
-  id?: number;
-
-  @IsNotEmpty({ message: 'Author email is required' })
-  @IsString()
-  @IsEmail()
-  @MinLength(3)
-  email: string;
+  // @IsNotEmpty({ message: 'Author email is required' })
+  // @IsString()
+  // @IsEmail()
+  // @MinLength(3)
+  // email: string;
 
   @IsNotEmpty({ message: 'Title is required' })
   @IsString()

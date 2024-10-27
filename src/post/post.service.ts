@@ -3,30 +3,21 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma.service';
 import { PostType } from '../types/post.type';
+import { user } from '@prisma/client';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create({
-    title,
-    content,
-    email,
-  }: CreatePostDto): Promise<
+  async create(
+    { title, content }: CreatePostDto,
+    id: user['id'],
+  ): Promise<
     Omit<PostType, 'id' | 'title' | 'content' | 'createdAt' | 'tags'>
   > {
-    const author = await this.prisma.user.findMany({
-      select: { id: true },
-      where: {
-        AND: [{ email }, { status: 'ACTIVE' }, { role: 'USER' }],
-      },
-    });
-    if (!author.length) {
-      throw new HttpException('Author not found', HttpStatus.UNAUTHORIZED);
-    }
     const post = await this.prisma.post.create({
       data: {
-        authorId: author[0].id,
+        authorId: id,
         title,
         content,
         createdAt: new Date(),

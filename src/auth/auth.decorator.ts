@@ -21,6 +21,6 @@ export const getCurrentUser = createParamDecorator(
 
     const user = request.user as CurrentUserToken;
 
-    return data ? user['email'] : user;
+    return data ? user : user;
   },
 );
