@@ -7,7 +7,7 @@ import { isEmail } from 'class-validator';
 import { UserType } from '../types/user.type';
 import { MailService } from 'src/mail/mail.service';
 import mailTemplate from '../mail/mail.template';
-import { Prisma } from '@prisma/client';
+import { hashPassword } from 'src/utils/hashPassword.util';
 
 @Injectable()
 export class UserService {
@@ -20,24 +20,22 @@ export class UserService {
     firstname,
     lastname,
     email,
-  }: CreateUserDto): Promise<
-    Pick<UserType, 'firstname' | 'lastname' | 'email' | 'fullname'>
-  > {
+    password,
+  }: CreateUserDto): Promise<Pick<UserType, 'email' | 'fullname'>> {
     const emailExists = await isEmailExists(this.prisma, email);
     if (emailExists) throw new ConflictException(`Email already exists.`);
 
     const user = await this.prisma.user.create({
-      select: {
-        fullname: true,
-        email: true,
-        firstname: true,
-        lastname: true,
-      },
       data: {
         firstname: firstname,
         lastname: lastname,
         fullname: `${firstname} ${lastname}`,
         email: email,
+        password: await hashPassword(password),
+      },
+      select: {
+        fullname: true,
+        email: true,
       },
     });
 
@@ -58,7 +56,9 @@ export class UserService {
 
   async findUserByEmail(
     email: string,
-  ): Promise<Pick<UserType, 'id' | 'fullname' | 'email' | 'status'>> {
+  ): Promise<
+    Pick<UserType, 'id' | 'fullname' | 'email' | 'status' | 'password'>
+  > {
     const checkEmailValid = isEmail(email);
     if (!checkEmailValid) throw new ConflictException(`Invalid Email.`);
 
@@ -72,6 +72,7 @@ export class UserService {
         fullname: true,
         email: true,
         status: true,
+        password: true,
       },
     });
     return { ...user, status: user.status as UserType['status'] };
@@ -172,5 +173,23 @@ export class UserService {
       },
     });
     return profile;
+  }
+
+  async setPassword(email: string, password: string) {
+    const emailExists = await isEmailExists(this.prisma, email);
+
+    if (!emailExists) {
+      throw new ConflictException(`Invalid Email.`);
+    }
+    return this.prisma.user.update({
+      where: { email },
+      data: {
+        password: password,
+      },
+      select: {
+        email: true,
+        password: true,
+      },
+    });
   }
 }

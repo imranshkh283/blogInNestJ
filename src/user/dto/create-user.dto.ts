@@ -3,6 +3,8 @@ import {
   IsNotEmpty,
   IsNumber,
   IsString,
+  Max,
+  MaxLength,
   Min,
   MinLength,
 } from 'class-validator';
@@ -21,6 +23,12 @@ export class CreateUserDto {
   @MinLength(3, { message: 'Lastname must be at least 3 characters' })
   @IsString()
   lastname: string;
+
+  @IsNotEmpty({ message: 'Password is required' })
+  @MinLength(6, { message: 'Password must be at least 6 characters' })
+  @MaxLength(18, { message: 'Password must be less than 50 characters' })
+  @IsString()
+  password: string;
 }
 
 export class CreateProfileDto {

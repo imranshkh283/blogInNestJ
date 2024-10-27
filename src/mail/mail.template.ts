@@ -1,7 +1,7 @@
 const BASE_URL =
   (process.env.DEV_STAGE === 'DEV' ? 'http://' : 'https://') +
   process.env.BASE_URL;
-const verificationLink = BASE_URL + '/verify-email/';
+const verificationLink = BASE_URL + 'user/verify-email/';
 
 const mailTemplate = (email: string) => `
 <html>
