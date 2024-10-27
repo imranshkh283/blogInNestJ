@@ -8,21 +8,22 @@ import {
   ParseIntPipe,
   Post,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { PostService } from './post.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PostType } from '../types/post.type';
+import { AuthGuard } from 'src/auth/guard/jwt-auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
   @Post('createPost')
   @HttpCode(HttpStatus.CREATED)
-  createPost(
-    @Body(ValidationPipe) data: CreatePostDto,
-  ) {
+  createPost(@Body(ValidationPipe) data: CreatePostDto) {
     return this.postService.create(data);
   }
 
