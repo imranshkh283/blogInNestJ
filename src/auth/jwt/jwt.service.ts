@@ -15,16 +15,12 @@ export class CustomJwtService {
   ) {}
 
   async signToken({ payload }: { payload: any }): Promise<string> {
-    const { email, sub } = payload;
     try {
-      return await this.jwt.signAsync(
-        { email, sub },
-        {
-          secret: process.env.ACCESS_TOKEN_SECRET,
-          expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
-          algorithm: 'HS256',
-        },
-      );
+      return await this.jwt.signAsync(payload, {
+        secret: process.env.ACCESS_TOKEN_SECRET,
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,
+        algorithm: 'HS256',
+      });
     } catch (error) {
       throw new UnauthorizedException('Could not sign token');
     }

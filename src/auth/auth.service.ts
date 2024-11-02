@@ -34,22 +34,20 @@ export class AuthService {
     );
     if (!hashPassword) throw new ConflictException(`Invalid Credentials.`);
 
-    if (hashPassword) {
-      const payload = {
-        sub: userDetails?.id,
-        email: userDetails?.email,
-        type: 'singIn',
-      };
+    const payload = {
+      sub: userDetails?.id,
+      email: userDetails?.email,
+      type: 'sign-in',
+    };
 
-      return {
-        token: await this.customJwtService.signToken({
-          payload,
-        }),
-        success: true,
-        message: 'Login Successful',
-        failure: false,
-      };
-    }
+    return {
+      token: await this.customJwtService.signToken({
+        payload,
+      }),
+      success: true,
+      message: 'Login Successful',
+      failure: false,
+    };
   }
 
   async forgotPassword(data) {
