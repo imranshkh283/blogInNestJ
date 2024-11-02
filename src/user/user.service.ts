@@ -6,7 +6,7 @@ import { isEmailExists } from '../utils/email.utils';
 import { isEmail } from 'class-validator';
 import { UserType } from '../types/user.type';
 import { MailService } from 'src/mail/mail.service';
-import mailTemplate from '../mail/mail.template';
+import VerifyEmailTemplate from '../mail/templates/verifymail.template';
 import { hashPassword } from 'src/utils/hashPassword.util';
 
 @Injectable()
@@ -133,7 +133,7 @@ export class UserService {
     await this.mailer.sendMail({
       to: email,
       subject: 'Verify Your Email Address',
-      text: mailTemplate(email),
+      text: VerifyEmailTemplate(email),
     });
 
     return 'Email sent successfully';

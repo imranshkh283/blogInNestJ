@@ -1,24 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma.service';
 import { UserService } from 'src/user/user.service';
 import { SignInDto } from './dto/sign-in.dto';
 import { user_status } from 'src/types/user.type';
-import { comparePassword } from 'src/utils/hashPassword.util';
-import { JwtService, JwtSignOptions } from '@nestjs/jwt';
+import { comparePassword, hashPassword } from 'src/utils/hashPassword.util';
+import { CustomJwtService } from './jwt/jwt.service';
+import { isEmailExists } from 'src/utils/email.utils';
+import ResetEMailTemplate from 'src/mail/templates/resetPassword.mail.template';
+import { MailService } from 'src/mail/mail.service';
 @Injectable()
 export class AuthService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly user: UserService,
-    private readonly jwtService: JwtService,
+    private readonly userService: UserService,
+    private readonly customJwtService: CustomJwtService,
+
+    private readonly mailer: MailService,
   ) {}
 
   async signIn(data: SignInDto) {
     const email = data?.email;
-    const userDetails = await this.user.findUserByEmail(email);
+    const userDetails = await this.userService.findUserByEmail(email);
 
     if (userDetails?.status == user_status.INACTIVE) {
-      const sendMail = await this.user.sendVerificationEmail(email);
+      const sendMail = await this.userService.sendVerificationEmail(email);
       if (sendMail) {
         return { message: 'please check your email' };
       }
@@ -31,10 +36,13 @@ export class AuthService {
       const payload = {
         sub: userDetails?.id,
         email: userDetails?.email,
+        type: 'singIn',
       };
 
       return {
-        token: await this.jwtService.signAsync(payload),
+        token: await this.customJwtService.signToken({
+          payload,
+        }),
         success: true,
         message: 'Login Successful',
         failure: false,
@@ -42,22 +50,47 @@ export class AuthService {
     }
   }
 
-  getAccessTokenOptions(user: number) {
-    return this.getTokenOption('access', user);
-  }
+  async forgotPassword(data) {
+    const email = data?.email;
 
-  private getTokenOption(
-    type: 'refresh' | 'access',
-    user: number,
-  ): JwtSignOptions {
-    const option: JwtSignOptions = {
-      secret: process.env.ACCESS_TOKEN_SECRET + user,
+    const emailExists = await isEmailExists(this.prisma, email);
+
+    if (!emailExists) {
+      throw new ConflictException(`Invalid Email.`);
+    }
+
+    const payload = {
+      email: email,
+      type: 'resetPassword',
     };
 
-    const expiration = process.env.ACCESS_TOKEN_EXPIRATION;
-    if (expiration) {
-      option.expiresIn = expiration;
+    const token = await this.customJwtService.generateResetToken(payload);
+
+    await this.mailer.sendMail({
+      to: email,
+      subject: 'Password Reset Link',
+      text: ResetEMailTemplate(token),
+    });
+
+    return 'Email sent successfully';
+  }
+  async resetPassword(token: string, password: string) {
+    const payload = await this.customJwtService.verfiyPasswordResetToken(token);
+
+    const email = payload.email;
+    const emailExists = await isEmailExists(this.prisma, email);
+
+    if (!emailExists) {
+      throw new ConflictException(`Invalid Email.`);
     }
-    return option;
+
+    const user = await this.userService.setPassword(
+      email,
+      await hashPassword(password),
+    );
+
+    if (user) {
+      return { message: 'Password reset successfully' };
+    }
   }
 }

@@ -31,6 +31,12 @@ export class CreateUserDto {
   password: string;
 }
 
+export class ForgotPassword {
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail({}, { message: 'Invalid email format' })
+  email: string;
+}
+
 export class CreateProfileDto {
   @IsNotEmpty({ message: 'Bio is required' })
   @Min(3, { message: 'Bio must be at least 3 characters' })

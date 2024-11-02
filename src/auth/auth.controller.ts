@@ -1,8 +1,10 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
+  Param,
   Post,
   ValidationPipe,
 } from '@nestjs/common';
@@ -17,5 +19,19 @@ export class AuthController {
   @HttpCode(HttpStatus.OK)
   async signIn(@Body(ValidationPipe) data: SignInDto) {
     return await this.authService.signIn(data);
+  }
+
+  @Post('/forgot-password')
+  @HttpCode(HttpStatus.OK)
+  async forgotPassword(@Body(ValidationPipe) data: Pick<SignInDto, 'email'>) {
+    return await this.authService.forgotPassword(data);
+  }
+
+  @Get('/reset-password/:token')
+  async resetPassword(
+    @Body('password') password: string,
+    @Param('token') token: string,
+  ) {
+    return await this.authService.resetPassword(token, password);
   }
 }
