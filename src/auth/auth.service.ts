@@ -32,6 +32,8 @@ export class AuthService {
       data?.password,
       userDetails?.password,
     );
+    if (!hashPassword) throw new ConflictException(`Invalid Credentials.`);
+
     if (hashPassword) {
       const payload = {
         sub: userDetails?.id,
