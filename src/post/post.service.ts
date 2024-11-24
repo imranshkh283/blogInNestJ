@@ -3,7 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { PrismaService } from '../prisma.service';
 import { PostType } from '../types/post.type';
-import { user } from '@prisma/client';
+import { post, user } from '@prisma/client';
 
 @Injectable()
 export class PostService {
@@ -88,5 +88,23 @@ export class PostService {
       where: { id },
     });
     return updateTags;
+  }
+
+  async getPostById(id: post['id']) {
+    const post = await this.prisma.post.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        tags: true,
+        createdAt: true,
+      },
+    });
+
+    if (!post) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
+    }
+    return post;
   }
 }
