@@ -39,9 +39,12 @@ export class CustomJwtService {
       if (!emailExists) {
         throw new ConflictException(`Invalid Email.`);
       }
-
+      const payload = {
+        email: email,
+        type: type,
+      };
       return await this.jwt.signAsync(
-        { email },
+        { payload },
         {
           secret: process.env.ACCESS_TOKEN_SECRET,
           expiresIn: process.env.ACCESS_TOKEN_EXPIRATION,

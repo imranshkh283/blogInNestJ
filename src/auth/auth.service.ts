@@ -78,6 +78,10 @@ export class AuthService {
     const payload = await this.customJwtService.verfiyPasswordResetToken(token);
 
     const email = payload.email;
+
+    if (payload.type !== 'resetPassword')
+      throw new ConflictException(`Invalid Token.`);
+
     const emailExists = await isEmailExists(this.prisma, email);
 
     if (!emailExists) {

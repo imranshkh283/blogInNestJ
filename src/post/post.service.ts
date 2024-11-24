@@ -36,7 +36,18 @@ export class PostService {
 
   findAll(): Promise<Pick<PostType, 'id' | 'title' | 'content'>[]> {
     return this.prisma.post.findMany({
-      select: { id: true, title: true, content: true, tags: true },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        tags: true,
+        authorId: true,
+        user: {
+          select: {
+            fullname: true,
+          },
+        },
+      },
     });
   }
 
